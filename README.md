@@ -171,10 +171,3 @@ Queries stored context and maintains session conversational history.
 
 ---
 
-## License
-
-This project is licensed under the MIT License.
-
-```
-
-```
