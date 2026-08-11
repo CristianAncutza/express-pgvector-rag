@@ -1,4 +1,4 @@
-import pdfParse from 'pdf-parse';
+import { PDFParse } from 'pdf-parse';
 
 export async function extractTextFromFile(file: Express.Multer.File): Promise<string> {
   const mimeType = file.mimetype;
@@ -10,8 +10,13 @@ export async function extractTextFromFile(file: Express.Multer.File): Promise<st
 
   // For PDF files
   if (mimeType === 'application/pdf') {
-    const data = await pdfParse(file.buffer);
-    return data.text;
+    const parser = new PDFParse({ data: file.buffer });
+    try {
+      const data = await parser.getText();
+      return data.text;
+    } finally {
+      await parser.destroy();
+    }
   }
 
   throw new Error(`File format not supported: ${mimeType}`);

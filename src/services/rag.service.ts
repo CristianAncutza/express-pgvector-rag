@@ -85,7 +85,7 @@ async function saveChatMessage(sessionId: string, role: 'user' | 'assistant', co
   await pool.query(query, [sessionId, role, content]);
 }
 
-export async function answerQuestionStream(question: string, sessionId: string) {
+export async function answerQuestionStream(question: string, sessionId: string): Promise<unknown> {
   // saves user response in db
   await saveChatMessage(sessionId, 'user', question);
 
