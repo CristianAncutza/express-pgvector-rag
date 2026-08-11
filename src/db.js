@@ -14,6 +14,7 @@ export async function initDb() {
   try {
     await client.query('CREATE EXTENSION IF NOT EXISTS vector;');
 
+    // Tabla para los documentos (RAG)
     await client.query(`
       CREATE TABLE IF NOT EXISTS documents (
         id SERIAL PRIMARY KEY,
@@ -27,6 +28,17 @@ export async function initDb() {
     await client.query(`
       CREATE INDEX IF NOT EXISTS documents_embedding_hnsw_idx 
       ON documents USING hnsw (embedding vector_cosine_ops);
+    `);
+
+    // Tabla para el historial del chat
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS chat_messages (
+        id SERIAL PRIMARY KEY,
+        session_id TEXT,
+        role TEXT NOT NULL,
+        content TEXT NOT NULL,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
     `);
 
     console.log('Database initialized successfully with pgvector extension.');

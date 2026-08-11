@@ -4,7 +4,7 @@ import { embed, streamText } from 'ai';
 import { pool } from '../db.js';
 
 const embeddingModel = google.textEmbeddingModel('gemini-embedding-001');
-const chatModel = google('gemini-2.0-flash-lite');
+const chatModel = google('gemini-3.5-flash');
 
 interface DocumentRow {
   id: number;
@@ -48,7 +48,7 @@ async function searchSimilarDocuments(userQuery: string, limit = 3): Promise<Doc
   const query = `
     SELECT content, metadata, 1 - (embedding <=> $1::vector) AS similarity
     FROM documents
-    WHERE 1 - (embedding <=> $1::vector) >= 0.60
+    WHERE 1 - (embedding <=> $1::vector) >= 0.30
     ORDER BY embedding <=> $1::vector ASC
     LIMIT $2;
   `;

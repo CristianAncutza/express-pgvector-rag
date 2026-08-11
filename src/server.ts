@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import { initDb } from './db.js';
 import { ingestDocument, answerQuestionStream } from './services/rag.service.js';
 import multer from 'multer';
-
+import { extractTextFromFile } from './services/file.service.js';
 dotenv.config();
 
 const app = express();
@@ -44,7 +44,7 @@ app.post('/api/chat', async (req, res) => {
 
     const currentSessionId = sessionId || 'default-session';
 
-    const result = await answerQuestionStream(question, currentSessionId);
+    const result = await answerQuestionStream(question, currentSessionId) as StreamableResult;
         
     res.setHeader('Content-Type', 'text/plain; charset=utf-8');
 
@@ -96,11 +96,12 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
     };
 
     const insertedChunks = await ingestDocument(extractedText, metadata);
+    const totalChunks = Array.isArray(insertedChunks) ? insertedChunks.length : 1;
 
     return res.status(201).json({
       message: 'File processed successfully.',
       filename: req.file.originalname,
-      totalChunks: insertedChunks.length,
+      totalChunks,
     });
   } catch (error: any) {
     console.error('Error processing files:', error);
